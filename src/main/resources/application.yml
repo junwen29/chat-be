@@ -1,0 +1,9 @@
+spring:
+  data:
+    mongodb:
+      uri: mongodb://mongoadmin:secret@localhost:27017/${spring.data.mongodb.database}
+  database: chat
+
+rabbitmq:
+  queues:
+    sendChat: SendChatMessage
