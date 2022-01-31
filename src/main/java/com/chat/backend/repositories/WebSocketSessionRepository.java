@@ -1,5 +1,6 @@
-package com.chat.backend;
+package com.chat.backend.repositories;
 
+import com.chat.backend.entities.WebSocketSession;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 

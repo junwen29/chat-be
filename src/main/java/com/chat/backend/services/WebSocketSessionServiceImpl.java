@@ -1,5 +1,7 @@
-package com.chat.backend;
+package com.chat.backend.services;
 
+import com.chat.backend.entities.WebSocketSession;
+import com.chat.backend.repositories.WebSocketSessionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

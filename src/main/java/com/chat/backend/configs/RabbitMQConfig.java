@@ -1,4 +1,4 @@
-package com.chat.backend;
+package com.chat.backend.configs;
 
 import org.springframework.amqp.core.Queue;
 import org.springframework.beans.factory.annotation.Value;

@@ -1,5 +1,8 @@
-package com.chat.backend;
+package com.chat.backend.configs;
 
+import com.chat.backend.AppHttpSessionHandshakeInterceptor;
+import com.chat.backend.AppWebSocketHandler;
+import com.chat.backend.AppWebSocketHandlerDecoratorFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;

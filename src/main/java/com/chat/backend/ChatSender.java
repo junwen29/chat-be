@@ -1,5 +1,6 @@
 package com.chat.backend;
 
+import lombok.extern.java.Log;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 @Component
+@Log
 public class ChatSender {
     @Autowired
     private RabbitTemplate template;
@@ -27,9 +29,9 @@ public class ChatSender {
         String message = "Hello World!";
         if (shouldScheduledChatMessage){
             this.template.convertAndSend(send.getName(), message);
-            System.out.println(" [x] Sent '" + message + "'");
+            log.info(" [x] Sent '" + message + "'");
         }
         else
-            System.out.println(" [x] Not sending scheduled message");
+            log.info(" [x] Not sending scheduled message");
     }
 }
