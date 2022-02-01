@@ -36,16 +36,30 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain chain) throws ServletException, IOException {
+        // Web Socket connections are able to send jwt in query string form only. Get jwt and validate
+        String jwt = request.getParameter("jwt");
 
         // Get authorization header and validate
         final String header = request.getHeader(HttpHeaders.AUTHORIZATION);
-        if (isEmpty(header) || !header.startsWith("Bearer ")) {
+
+        boolean hasJwtFromWebSocket = !isEmpty(jwt);
+        boolean hasJWT = hasJwtFromWebSocket || !(isEmpty(header) || !header.startsWith("Bearer "));
+
+        if (!hasJWT) {
             chain.doFilter(request, response);
             return;
         }
 
         // Get jwt token and validate
-        final String token = header.split(" ")[1].trim();
+        String token;
+        if (hasJwtFromWebSocket){
+            token = jwt;
+            request.getSession().setAttribute("jwt", token); // put the jwt inside the session for identification later at web socket
+        }
+        else {
+            token = header.split(" ")[1].trim();
+        }
+
         if (!jwtUtil.validate(token)) {
             chain.doFilter(request, response);
             return;
@@ -53,7 +67,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
         // Get user identity and set it on the spring security context
         UserDetails userDetails = userRepository
-                .findByName(jwtUtil.getName(token))
+                .findByEmail(jwtUtil.getEmail(token))
                 .orElse(null);
 
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(

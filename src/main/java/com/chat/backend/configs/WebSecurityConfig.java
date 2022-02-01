@@ -87,7 +87,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .exceptionHandling()
                 .authenticationEntryPoint(
                         (request, response, ex) -> {
-                            log.info(String.format("Unauthorized request - %s", ex.getMessage()));
+                            log.info(String.format("Unauthorized request to uri %s - %s", request.getRequestURI(), ex.getMessage()));
                             response.sendError(HttpStatus.UNAUTHORIZED.value(), ex.getMessage());
                         }
                 )
@@ -101,9 +101,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(String.format("%s/**", swaggerPath)).permitAll()
                 // Our public endpoints
                 .antMatchers("/api/public/**").permitAll()
-                .antMatchers(HttpMethod.GET, "/api/v1/users/**").permitAll()
-                .antMatchers(HttpMethod.POST, "/api/v1/users/**").permitAll()
-                .antMatchers(HttpMethod.OPTIONS, "/api/v1/users/**").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/v1/users/authenticate").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/v1/users/register").permitAll()
+                .antMatchers(HttpMethod.OPTIONS, "/api/v1/users/authenticate").permitAll()
+                .antMatchers(HttpMethod.OPTIONS, "/api/v1/users/register").permitAll()
                 // Our private endpoints
                 .anyRequest().authenticated();
 

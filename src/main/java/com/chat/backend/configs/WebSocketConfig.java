@@ -1,7 +1,6 @@
 package com.chat.backend.configs;
 
 import com.chat.backend.AppHttpSessionHandshakeInterceptor;
-import com.chat.backend.AppWebSocketHandler;
 import com.chat.backend.AppWebSocketHandlerDecoratorFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,9 +20,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer  {
     private List<String> allowedOrigins;
 
     @Autowired
-    private AppWebSocketHandler handler;
-
-    @Autowired
     private AppWebSocketHandlerDecoratorFactory factory;
 
     @Override
@@ -37,7 +33,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer  {
         registry
                 .addEndpoint("/sessions")
                 .addInterceptors(new AppHttpSessionHandshakeInterceptor())
-                .setAllowedOrigins(String.valueOf(allowedOrigins))
+                .setAllowedOrigins(allowedOrigins.toArray(String[]::new))
                 .withSockJS();
     }
 
@@ -50,4 +46,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer  {
 
         WebSocketMessageBrokerConfigurer.super.configureWebSocketTransport(registry);
     }
+
+
 }

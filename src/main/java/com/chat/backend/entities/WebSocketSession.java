@@ -27,6 +27,11 @@ public class WebSocketSession {
 
     private String status;
 
+    private String name;
+
+    @Field("user_id")
+    private String userId;
+
     @Field("created_at")
     private LocalDateTime createdAt;
 
