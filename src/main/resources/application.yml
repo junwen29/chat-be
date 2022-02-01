@@ -13,3 +13,22 @@ app:
 rabbitmq:
   queues:
     sendChat: SendChatMessage
+
+springdoc:
+  api-docs:
+    enabled: true
+    path: /rest-api-docs
+  swagger-ui:
+    path: /swagger-ui
+
+cors:
+  allowedOrigins: http://localhost:8080,http://localhost:8081
+  allowedHeaders: authorization,content-type,x-auth-token
+  allowedMethods: GET,POST,PUT,PATCH,DELETE,OPTIONS
+  allowedCredentials: true
+
+jwt:
+  secret: EUQQ7Cltj9yKwhOsUgWTwW3BYkv8dmUz9yjiBCpfsqaggE6aj2fLyJfLoLrTE6j
+  issuer: localhost
+
+
