@@ -6,5 +6,5 @@ public interface WebSocketSessionService {
 
     void create(WebSocketSession ws);
 
-    void update(String webSocketSessionId);
+    void closeSession(String webSocketSessionId, String userName);
 }

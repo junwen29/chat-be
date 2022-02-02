@@ -1,6 +1,5 @@
 package com.chat.backend.validations;
 
-import java.util.Arrays;
 import java.util.List;
 
 import javax.validation.ConstraintValidator;

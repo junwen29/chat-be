@@ -5,8 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.MongoId;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -19,7 +19,7 @@ import java.util.Collection;
 @AllArgsConstructor
 @Document(collection = "users")
 public class ChatAppUser extends BaseDocument implements UserDetails, Serializable {
-    @MongoId
+    @Id
     private String id;
 
     private String name;

@@ -11,7 +11,6 @@ import com.chat.backend.utils.JwtUtil;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -70,14 +69,14 @@ public class ChatAppUserServiceImpl implements ChatAppUserService {
         LoginSuccessResponse response = new LoginSuccessResponse();
         response.setToken(jwtUtil.generateAccessToken(user));
         response.setName(user.getName());
-        response.setName(user.getEmail());
+        response.setEmailAddress(user.getEmail());
 
         return response;
     }
 
     @Override
     public void logout() {
-
+    // TODO close all chat web socket connections
     }
 
 }
