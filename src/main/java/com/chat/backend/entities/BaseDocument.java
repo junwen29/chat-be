@@ -1,14 +1,14 @@
 package com.chat.backend.entities;
 
+import lombok.Data;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-import java.time.LocalDateTime;
-
+@Data
 public class BaseDocument {
 
     @Field("created_at")
-    private LocalDateTime createdAt;
+    private String createdAt;
 
     @Field("updated_at")
-    private LocalDateTime updatedAt;
+    private String updatedAt;
 }

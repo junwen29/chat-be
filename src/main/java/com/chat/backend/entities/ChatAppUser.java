@@ -7,6 +7,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -28,12 +29,16 @@ public class ChatAppUser extends BaseDocument implements UserDetails, Serializab
 
     private String password;
 
+    @Field("is_account_non_expired")
     private boolean isAccountNonExpired;
 
+    @Field("is_account_non_locked")
     private boolean isAccountNonLocked;
 
+    @Field("is_credentials_non_expired")
     private boolean isCredentialsNonExpired;
 
+    @Field("is_enabled")
     private boolean isEnabled;
 
     public ChatAppUser(AccountRegistrationForm form) {

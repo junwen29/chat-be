@@ -7,6 +7,7 @@ import com.chat.backend.entities.ChatAppUser;
 import com.chat.backend.exceptions.PasswordsDoNotMatchException;
 import com.chat.backend.exceptions.UserAlreadyExistException;
 import com.chat.backend.repositories.UserRepository;
+import com.chat.backend.utils.DateTimeUtil;
 import com.chat.backend.utils.JwtUtil;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,9 @@ public class ChatAppUserServiceImpl implements ChatAppUserService {
     @Autowired
     private JwtUtil jwtUtil;
 
+    @Autowired
+    private DateTimeUtil dateTimeUtil;
+
     @Override
     public void register(AccountRegistrationForm form) {
         ChatAppUser user = new ChatAppUser(form);
@@ -55,6 +59,7 @@ public class ChatAppUserServiceImpl implements ChatAppUserService {
         }
 
         user.setPassword(passwordEncoder.encode(form.getPassword()));
+        user.setCreatedAt(dateTimeUtil.now());
         repository.save(user);
         log.info(String.format("New user registered: %s", user.getName()));
     }

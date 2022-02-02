@@ -15,7 +15,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 @Document(collection = "web_socket_sessions")
-public class WebSocketSession {
+public class WebSocketSession extends BaseDocument {
 
     @Id
     private String id;
@@ -36,16 +36,9 @@ public class WebSocketSession {
     @Field("user_id")
     private String userId;
 
-    @Field("created_at")
-    private LocalDateTime createdAt;
-
-    @Field("updated_at")
-    private LocalDateTime updatedAt;
-
     public WebSocketSession(org.springframework.web.socket.WebSocketSession ws) {
         this.sessionId = ws.getId();
         this.clientUri = Objects.requireNonNull(ws.getUri()).toString();
         this.status = ws.isOpen() ? String.valueOf(WebSocketSessionState.OPEN) : String.valueOf(WebSocketSessionState.CLOSED);
-        this.createdAt = LocalDateTime.now();
     }
 }
