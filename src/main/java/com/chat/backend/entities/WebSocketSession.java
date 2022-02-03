@@ -37,7 +37,7 @@ public class WebSocketSession extends BaseDocument {
     private String userId;
 
     public WebSocketSession(org.springframework.web.socket.WebSocketSession ws) {
-        this.sessionId = ws.getId();
+        this.serverUri = ws.getId();
         this.clientUri = Objects.requireNonNull(ws.getUri()).toString();
         this.status = ws.isOpen() ? String.valueOf(WebSocketSessionState.OPEN) : String.valueOf(WebSocketSessionState.CLOSED);
     }
