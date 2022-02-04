@@ -3,6 +3,7 @@ package com.chat.backend.services;
 import com.chat.backend.dto.AccountRegistrationForm;
 import com.chat.backend.dto.LoginForm;
 import com.chat.backend.dto.LoginSuccessResponse;
+import com.chat.backend.dto.UserListItem;
 import com.chat.backend.entities.ChatAppUser;
 import com.chat.backend.exceptions.PasswordsDoNotMatchException;
 import com.chat.backend.exceptions.UserAlreadyExistException;
@@ -16,6 +17,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Service
@@ -82,6 +86,33 @@ public class ChatAppUserServiceImpl implements ChatAppUserService {
     @Override
     public void logout() {
     // TODO close all chat web socket connections
+    }
+
+    /**
+     * @param userId is the requester userId
+     * @return a list of users without the requester user
+     */
+    @Override
+    public List<UserListItem> getAll(String userId) {
+        List<UserListItem> list = new ArrayList<>();
+
+        List<ChatAppUser> chatAppUsers = repository.findAll();
+        chatAppUsers.removeIf(chatAppUser -> chatAppUser.getId().equals(userId));
+
+        for (int i = 0; i < chatAppUsers.size(); i++) {
+            ChatAppUser u = chatAppUsers.get(i);
+            list.add(
+                    new UserListItem(
+                            u.getId(),
+                            String.format("https://cdn.vuetifyjs.com/images/lists/%d.jpg", i+1),
+                            u.getName(),
+                            String.format("last seen %d minutes ago", i+1),
+                            i % 2 == 0
+                    )
+            );
+        }
+
+        return list;
     }
 
 }

@@ -3,14 +3,18 @@ package com.chat.backend.controllers;
 import com.chat.backend.dto.AccountRegistrationForm;
 import com.chat.backend.dto.LoginForm;
 import com.chat.backend.dto.LoginSuccessResponse;
+import com.chat.backend.dto.UserListItem;
 import com.chat.backend.services.ChatAppUserService;
+import com.chat.backend.utils.JwtUtil;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -19,6 +23,9 @@ import javax.validation.Valid;
 public class UserController {
     @Autowired
     private ChatAppUserService userService;
+
+    @Autowired
+    private JwtUtil jwtUtil;
 
     @PostMapping("/register")
     public void register(@Valid @RequestBody AccountRegistrationForm form) {
@@ -35,5 +42,20 @@ public class UserController {
         return ResponseEntity.ok()
                 .header(HttpHeaders.AUTHORIZATION, response.getToken())
                 .body(response);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<UserListItem>> getAllUsers(HttpServletRequest request){
+        // Get authorization header and validate
+        final String header = request.getHeader(HttpHeaders.AUTHORIZATION);
+        String token = header.split(" ")[1].trim();
+        String id = jwtUtil.getUserId(token);
+
+        String msg = "Received request with to get all users";
+        log.info(msg);
+        List<UserListItem> list = userService.getAll(id);
+
+        return ResponseEntity.ok()
+                .body(list);
     }
 }
