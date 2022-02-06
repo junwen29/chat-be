@@ -8,7 +8,6 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Data
@@ -37,8 +36,8 @@ public class WebSocketSession extends BaseDocument {
     private String userId;
 
     public WebSocketSession(org.springframework.web.socket.WebSocketSession ws) {
-        this.serverUri = ws.getId();
-        this.clientUri = Objects.requireNonNull(ws.getUri()).toString();
+        this.clientUri = ws.getHandshakeHeaders().getOrigin();
+        this.sessionId = ws.getId();
         this.status = ws.isOpen() ? String.valueOf(WebSocketSessionState.OPEN) : String.valueOf(WebSocketSessionState.CLOSED);
     }
 }

@@ -36,7 +36,7 @@ public class WebSocketSessionServiceImpl implements WebSocketSessionService {
         InetAddress ip;
         try {
             ip = InetAddress.getLocalHost();
-            ws.setClientUri(String.format("http://%s:%s", ip.getHostAddress(), serverPort));
+            ws.setServerUri(String.format("http://%s:%s", ip.getHostAddress(), serverPort));
         } catch (UnknownHostException e) {
             log.info("Unable to detect server ip address and host name to record in web socket session documents");
         }
