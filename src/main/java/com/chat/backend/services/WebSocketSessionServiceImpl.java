@@ -1,5 +1,6 @@
 package com.chat.backend.services;
 
+import com.chat.backend.AppConstants;
 import com.chat.backend.entities.WebSocketSession;
 import com.chat.backend.enums.WebSocketSessionState;
 import com.chat.backend.repositories.WebSocketSessionRepository;
@@ -41,6 +42,7 @@ public class WebSocketSessionServiceImpl implements WebSocketSessionService {
             log.info("Unable to detect server ip address and host name to record in web socket session documents");
         }
         ws.setCreatedAt(dateTimeUtil.now());
+        ws.setCreatedBy(AppConstants.NAME);
         WebSocketSession saved = repository.save(ws);
         log.info(String.format("New WebSocketSession details saved with session id = %s", saved.getSessionId()));
     }
@@ -59,6 +61,7 @@ public class WebSocketSessionServiceImpl implements WebSocketSessionService {
         if (ws != null){
             ws.setStatus(String.valueOf(WebSocketSessionState.CLOSED));
             ws.setUpdatedAt(dateTimeUtil.now());
+            ws.setModifiedBy(AppConstants.NAME);
             repository.save(ws);
             log.info(String.format("Updated web socket session document from database base with name=%s and session id=%s .",userName, webSocketSessionId));
         }

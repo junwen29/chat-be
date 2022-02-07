@@ -11,4 +11,10 @@ public class BaseDocument {
 
     @Field("updated_at")
     private String updatedAt;
+
+    @Field("created_by")
+    private String createdBy;
+
+    @Field("modified_by")
+    private String modifiedBy;
 }

@@ -19,7 +19,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/users")
 @Log
-@CrossOrigin
 public class UserController {
     @Autowired
     private ChatAppUserService userService;
