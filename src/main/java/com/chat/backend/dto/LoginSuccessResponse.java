@@ -11,4 +11,5 @@ public class LoginSuccessResponse {
     private String name;
     private String token;
     private String emailAddress;
+    private String initials;
 }

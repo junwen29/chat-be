@@ -85,6 +85,7 @@ public class ChatAppUserServiceImpl implements ChatAppUserService {
         response.setToken(jwtUtil.generateAccessToken(user));
         response.setName(user.getName());
         response.setEmailAddress(user.getEmail());
+        response.setInitials(user.getInitials());
 
         return response;
     }

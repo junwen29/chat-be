@@ -50,6 +50,18 @@ public class ChatAppUser extends BaseDocument implements UserDetails, Serializab
         this.isEnabled = true;
     }
 
+    public String getInitials(){
+        String[] arr = this.name.split(" ");
+        if (arr.length > 2){
+            char first = arr[0].toUpperCase().charAt(0);
+            char last = arr[arr.length -1].toUpperCase().charAt(0);
+            return String.valueOf(first) + last;
+        }
+        else {
+            return String.valueOf(arr[0].toUpperCase().charAt(0));
+        }
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return null;
