@@ -15,6 +15,6 @@ public class BaseDocument {
     @Field("created_by")
     private String createdBy;
 
-    @Field("modified_by")
-    private String modifiedBy;
+    @Field("updated_by")
+    private String updatedBy;
 }

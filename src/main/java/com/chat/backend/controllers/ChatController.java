@@ -26,7 +26,7 @@ public class ChatController {
     /**
      * This aims to return user the chat room with the selected user if any
      * @param userId belongs to the recipient that the user wants to chat with
-     * @param request to get the user Id
+     * @param request to get the user id
      */
     @GetMapping("/rooms")
     public void getChatRoom(@RequestParam String userId, HttpServletRequest request){

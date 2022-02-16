@@ -8,6 +8,7 @@ import com.chat.backend.utils.DateTimeUtil;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -15,7 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @Log
@@ -43,6 +44,8 @@ public class WebSocketSessionServiceImpl implements WebSocketSessionService {
         }
         ws.setCreatedAt(dateTimeUtil.now());
         ws.setCreatedBy(AppConstants.NAME);
+        ws.setUpdatedAt(dateTimeUtil.now());
+        ws.setUpdatedBy(AppConstants.NAME);
         WebSocketSession saved = repository.save(ws);
         log.info(String.format("New WebSocketSession details saved with session id = %s", saved.getSessionId()));
     }
@@ -61,7 +64,7 @@ public class WebSocketSessionServiceImpl implements WebSocketSessionService {
         if (ws != null){
             ws.setStatus(String.valueOf(WebSocketSessionState.CLOSED));
             ws.setUpdatedAt(dateTimeUtil.now());
-            ws.setModifiedBy(AppConstants.NAME);
+            ws.setUpdatedBy(AppConstants.NAME);
             repository.save(ws);
             log.info(String.format("Updated web socket session document from database base with name=%s and session id=%s .",userName, webSocketSessionId));
         }
@@ -69,5 +72,29 @@ public class WebSocketSessionServiceImpl implements WebSocketSessionService {
             log.info(String.format("Unable to find web socket session document from database base with name=%s and session id=%s .",userName, webSocketSessionId));
         }
 
+    }
+
+    @Override
+    public List<WebSocketSession> findAllOpenSessions(String id) {
+        return mongoTemplate.find(
+                Query.query(
+                        Criteria.where("user_id").is(id).
+                                and("status").is(String.valueOf(WebSocketSessionState.OPEN))
+                ),
+                WebSocketSession.class,
+                "web_socket_sessions"
+        );
+    }
+
+    /**
+     * @param id of the user
+     * @return the single latest session regardless of the session status
+     */
+    @Override
+    public WebSocketSession getLastSession(String id) {
+        Query query = new Query();
+        query.with(Sort.by(Sort.Direction.DESC, "updated_at"));
+        query.addCriteria(Criteria.where("user_id").is(id));
+        return mongoTemplate.findOne(query, WebSocketSession.class);
     }
 }

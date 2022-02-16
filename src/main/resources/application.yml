@@ -10,6 +10,7 @@ spring:
 app:
   scheduledChatMessage: false
   dateTimeFormat: yyyy-MM-dd HH:mm:ss.SSS
+  dateFormat: yyyy-MM-dd
   timeZone: Asia/Singapore
 
 rabbitmq:

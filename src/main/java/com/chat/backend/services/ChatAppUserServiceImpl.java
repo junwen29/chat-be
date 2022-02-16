@@ -5,6 +5,7 @@ import com.chat.backend.dto.LoginForm;
 import com.chat.backend.dto.LoginSuccessResponse;
 import com.chat.backend.dto.UserListItem;
 import com.chat.backend.entities.ChatAppUser;
+import com.chat.backend.entities.WebSocketSession;
 import com.chat.backend.exceptions.PasswordsDoNotMatchException;
 import com.chat.backend.exceptions.UserAlreadyExistException;
 import com.chat.backend.repositories.UserRepository;
@@ -18,8 +19,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 
 @Service
@@ -40,6 +43,9 @@ public class ChatAppUserServiceImpl implements ChatAppUserService {
 
     @Autowired
     private DateTimeUtil dateTimeUtil;
+
+    @Autowired
+    private WebSocketSessionService webSocketSessionService;
 
     @Override
     public void register(AccountRegistrationForm form) {
@@ -97,6 +103,7 @@ public class ChatAppUserServiceImpl implements ChatAppUserService {
         List<UserListItem> list = new ArrayList<>();
 
         List<ChatAppUser> chatAppUsers = repository.findAll();
+        // remove requester user
         chatAppUsers.removeIf(chatAppUser -> chatAppUser.getId().equals(userId));
 
         for (int i = 0; i < chatAppUsers.size(); i++) {
@@ -106,8 +113,8 @@ public class ChatAppUserServiceImpl implements ChatAppUserService {
                             u.getId(),
                             String.format("https://cdn.vuetifyjs.com/images/lists/%d.jpg", i+1),
                             u.getName(),
-                            String.format("last seen %d minutes ago", i+1),
-                            i % 2 == 0
+                            getLastSeen(u),
+                            isUserOnline(u)
                     )
             );
         }
@@ -115,4 +122,61 @@ public class ChatAppUserServiceImpl implements ChatAppUserService {
         return list;
     }
 
+    /**
+     * @param u for checking online status
+     * @return true if user is online
+     */
+    @Override
+    public boolean isUserOnline(ChatAppUser u) {
+        List<WebSocketSession> webSocketSessions = webSocketSessionService.findAllOpenSessions(u.getId());
+        return webSocketSessions.size() > 1;
+    }
+
+    @Override
+    public String getLastSeen(ChatAppUser u) {
+        WebSocketSession ws = webSocketSessionService.getLastSession(u.getId());
+
+        // user has never established web socket session before
+        if (ws == null){
+            return null;
+        }
+        else {
+            String lastUpdatedTime = ws.getUpdatedAt();
+
+            long diffInMillieSeconds;
+            try {
+                diffInMillieSeconds = dateTimeUtil.difference(lastUpdatedTime, dateTimeUtil.now());
+
+                long diffMinutes = TimeUnit.MINUTES.convert(diffInMillieSeconds, TimeUnit.MILLISECONDS);
+
+                if (diffMinutes < 2){
+                    // we want to avoid returning // "last seen 1 minutes ago"
+                    return "last seen a minute ago";
+                }
+                else if (diffMinutes < 60){
+                    return String.format("last seen %d minutes ago", diffMinutes);
+                }
+                else {
+                    long diffHours = TimeUnit.HOURS.convert(diffInMillieSeconds, TimeUnit.MILLISECONDS);
+                    if (diffHours < 24){
+                        return String.format("last seen %d hours ago", diffHours);
+                    }
+                    else {
+                        long diffDays = TimeUnit.DAYS.convert(diffInMillieSeconds, TimeUnit.MILLISECONDS);
+                        if (diffDays < 7) {
+                            return String.format("last seen %d days ago", diffDays);
+                        }
+                        else {
+                            return String.format("last seen on %s", dateTimeUtil.getDateOnly(lastUpdatedTime));
+                        }
+                    }
+                }
+
+            } catch (ParseException e) {
+                log.severe(String.format("FAILED to parse last updated time: %s while checking for last seen of user: %s", lastUpdatedTime, u.getName()));
+            }
+        }
+
+        return null;
+    }
 }
