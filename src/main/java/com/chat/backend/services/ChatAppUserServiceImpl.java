@@ -130,7 +130,7 @@ public class ChatAppUserServiceImpl implements ChatAppUserService {
     @Override
     public boolean isUserOnline(ChatAppUser u) {
         List<WebSocketSession> webSocketSessions = webSocketSessionService.findAllOpenSessions(u.getId());
-        return webSocketSessions.size() > 1;
+        return webSocketSessions.size() > 0;
     }
 
     @Override
