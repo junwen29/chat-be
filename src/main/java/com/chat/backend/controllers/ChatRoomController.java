@@ -31,15 +31,16 @@ public class ChatRoomController {
             HttpServletRequest request
     ){
         String id = jwtUtil.getUserId(request);
-        log.info(String.format("Request from user with id = %s to get chat rooms", id));
+        log.info(String.format("Request from user with id = %s to get chat rooms with user id = %s", id, userId));
 
         if (userId == null) {
             List<ChatRoom> chatRooms = chatRoomService.getUserChatRooms(id);
+            log.info(String.format("Returned %d chat rooms to user with id = %s", chatRooms.size(), id));
             return ResponseEntity.ok().body(chatRooms);
         }
 
         ChatRoom chatRoom = chatRoomService.getChatRoomWithUser(id, userId);
-
+        log.info(String.format("Returned %d chat rooms to user with id = %s", 1, id));
         return ResponseEntity.ok().body(List.of(chatRoom));
     }
 }

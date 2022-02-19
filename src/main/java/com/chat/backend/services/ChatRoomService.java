@@ -12,6 +12,7 @@ public interface ChatRoomService {
     /**
      * @param id of the requester user
      * @return all the chat rooms the user participates in
+     * if the chat room members size = 2, the title of the chat room should be the other member's name
      */
     List<ChatRoom> getUserChatRooms(String id);
 

@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Log
@@ -37,8 +38,19 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                 Criteria.where("members.id").is(id)
         );
         query.with(Sort.by(Sort.Direction.DESC, "updated_at"));
+        List<ChatRoom> chatRooms = mongoTemplate.find(query, ChatRoom.class);
+        chatRooms.forEach(chatRoom -> {
+            List<ChatRoomMember> members = chatRoom.getMembers();
+            members.removeIf(member -> member.getId().equals(id));
 
-        return mongoTemplate.find(query, ChatRoom.class);
+            // Single Chat ==> need to add in the title
+            if (members.size() == 1){
+                List<String> names = members.stream().map(ChatRoomMember::getName).collect(Collectors.toList());
+                chatRoom.setTitle( names.get(0));
+            }
+        });
+
+        return chatRooms;
     }
 
     @Override
