@@ -11,6 +11,7 @@ app:
   scheduledChatMessage: false
   dateTimeFormat: yyyy-MM-dd HH:mm:ss.SSS
   dateFormat: yyyy-MM-dd
+  timeFormat: HH:mm
   timeZone: Asia/Singapore
   encrypt:
     password: password123

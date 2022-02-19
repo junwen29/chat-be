@@ -1,5 +1,7 @@
 package com.chat.backend.services;
 
+import com.chat.backend.dto.DecryptedChatRoom;
+import com.chat.backend.entities.ChatMessage;
 import com.chat.backend.entities.ChatRoom;
 import com.chat.backend.entities.ChatRoomMember;
 import com.chat.backend.repositories.ChatRoomRepository;
@@ -12,6 +14,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,8 +34,11 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     @Autowired
     private ChatAppUserService userService;
 
+    @Autowired
+    private EncryptService encryptService;
+
     @Override
-    public List<ChatRoom> getUserChatRooms(String id) {
+    public List<DecryptedChatRoom> getUserChatRooms(String id) {
         Query query = new Query();
         query.addCriteria(
                 Criteria.where("members.id").is(id)
@@ -46,15 +52,15 @@ public class ChatRoomServiceImpl implements ChatRoomService {
             // Single Chat ==> need to add in the title
             if (members.size() == 1){
                 List<String> names = members.stream().map(ChatRoomMember::getName).collect(Collectors.toList());
-                chatRoom.setTitle( names.get(0));
+                chatRoom.setTitle(names.get(0));
             }
         });
 
-        return chatRooms;
+        return chatRooms.stream().map(this::decryptChatRoom).collect(Collectors.toList());
     }
 
     @Override
-    public ChatRoom getChatRoomWithUser(String userId, String selectedUserId) {
+    public DecryptedChatRoom getChatRoomWithUser(String userId, String selectedUserId) {
         Query query = new Query();
 
         query.addCriteria(
@@ -79,7 +85,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
             chatRoom = create(members, defaultAvatarUrl, owner);
         }
 
-        return chatRoom;
+        return decryptChatRoom(chatRoom);
     }
 
     @Override
@@ -102,5 +108,33 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         log.info(msg);
 
         return saved;
+    }
+
+    @Override
+    public ChatRoom updateLastMessage(ChatMessage lastMsg) {
+        ChatRoom chatRoom = repository.findById(lastMsg.getChatRoomId()).orElse(null);
+
+        if (chatRoom != null){
+            chatRoom.setLastMessage(lastMsg.getEncryptedText());
+            chatRoom.setLastMessageAt(lastMsg.getCreatedAt());
+            chatRoom.setUpdatedBy(lastMsg.getCreatedBy());
+            return repository.save(chatRoom);
+        }
+        return null;
+    }
+
+    private DecryptedChatRoom decryptChatRoom(ChatRoom encrypted){
+        byte[] encryptedLastMessage = encrypted.getLastMessage();
+        byte[] decrypted = encryptService.decrypt(encryptedLastMessage);
+
+        DecryptedChatRoom decryptedChatRoom = new DecryptedChatRoom(encrypted, new String(decrypted));
+        try {
+            String timeOnly = dateTimeUtil.getTimeOnly(decryptedChatRoom.getLastMessageAt());
+            decryptedChatRoom.setLastMessageAt(timeOnly);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            log.info(String.format("Unable to parse chat room last message at field: %s", decryptedChatRoom.getLastMessageAt()));
+        }
+        return decryptedChatRoom;
     }
 }

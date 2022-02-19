@@ -26,7 +26,7 @@ public class ChatRoom extends BaseDocument {
     private String title;
 
     @Field("last_message")
-    private String lastMessage;
+    private byte[] lastMessage;
 
     @Field("last_message_at")
     private String lastMessageAt;

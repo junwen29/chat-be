@@ -14,9 +14,14 @@ import lombok.NoArgsConstructor;
 public class DecryptedChatMessage extends BaseDocument {
     private String id;
 
-    private String text;
+    private String content;
 
     private String chatRoomId;
+
+    private String avatar;
+
+    // indicate from ME or from others
+    private String from;
 
     public DecryptedChatMessage(ChatMessage encrypted) {
         this.id =encrypted.getId();
