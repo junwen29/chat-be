@@ -8,6 +8,7 @@ import com.chat.backend.entities.ChatAppUser;
 import com.chat.backend.entities.WebSocketSession;
 import com.chat.backend.exceptions.PasswordsDoNotMatchException;
 import com.chat.backend.exceptions.UserAlreadyExistException;
+import com.chat.backend.exceptions.UserNotFoundException;
 import com.chat.backend.repositories.UserRepository;
 import com.chat.backend.utils.DateTimeUtil;
 import com.chat.backend.utils.JwtUtil;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Service;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 
@@ -123,10 +125,7 @@ public class ChatAppUserServiceImpl implements ChatAppUserService {
         return list;
     }
 
-    /**
-     * @param u for checking online status
-     * @return true if user is online
-     */
+
     @Override
     public boolean isUserOnline(ChatAppUser u) {
         List<WebSocketSession> webSocketSessions = webSocketSessionService.findAllOpenSessions(u.getId());
@@ -159,11 +158,19 @@ public class ChatAppUserServiceImpl implements ChatAppUserService {
                 }
                 else {
                     long diffHours = TimeUnit.HOURS.convert(diffInMillieSeconds, TimeUnit.MILLISECONDS);
-                    if (diffHours < 24){
+                    if (diffHours < 2){
+                        // we want to avoid returning // "last seen 1 hours ago"
+                        return "last seen a hour ago";
+                    }
+                    else if (diffHours < 24){
                         return String.format("last seen %d hours ago", diffHours);
                     }
                     else {
                         long diffDays = TimeUnit.DAYS.convert(diffInMillieSeconds, TimeUnit.MILLISECONDS);
+                        if (diffDays < 2){
+                            // we want to avoid returning // "last seen 1 days ago"
+                            return "last seen a day ago";
+                        }
                         if (diffDays < 7) {
                             return String.format("last seen %d days ago", diffDays);
                         }
@@ -179,5 +186,15 @@ public class ChatAppUserServiceImpl implements ChatAppUserService {
         }
 
         return null;
+    }
+
+    @Override
+    public String getName(String userId) {
+        Optional<ChatAppUser> optional = repository.findById(userId);
+        if (optional.isPresent()){
+            return optional.get().getName();
+        }
+        else
+            throw new UserNotFoundException(String.format("Unable to find user with id = %s",userId));
     }
 }

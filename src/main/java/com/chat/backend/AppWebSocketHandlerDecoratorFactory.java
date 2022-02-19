@@ -62,7 +62,6 @@ public class AppWebSocketHandlerDecoratorFactory implements WebSocketHandlerDeco
 
             @Override
             public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) throws Exception {
-                // TODO update session details to mongo
                 super.afterConnectionClosed(session, closeStatus);
 
                 try {

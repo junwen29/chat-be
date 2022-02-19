@@ -12,6 +12,9 @@ app:
   dateTimeFormat: yyyy-MM-dd HH:mm:ss.SSS
   dateFormat: yyyy-MM-dd
   timeZone: Asia/Singapore
+  encrypt:
+    password: password123
+    salt: 2e93988d-bc7b-47cc-8e90-30795c642e37
 
 rabbitmq:
   queues:

@@ -16,7 +16,18 @@ public interface ChatAppUserService {
 
     List<UserListItem> getAll(String userId);
 
+    /**
+     * @param user for checking online status
+     * @return true if user is online
+     */
     boolean isUserOnline(ChatAppUser user);
 
+    /**
+     * @param user with a valid id
+     * @return a string to describe various last seen statements up to days.
+     *
+     */
     String getLastSeen(ChatAppUser user);
+
+    String getName(String userId);
 }

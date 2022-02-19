@@ -49,9 +49,8 @@ public class UserController {
         final String header = request.getHeader(HttpHeaders.AUTHORIZATION);
         String token = header.split(" ")[1].trim();
         String id = jwtUtil.getUserId(token);
+        log.info(String.format("Request from user with id = %s to get all users", id));
 
-        String msg = "Received request with to get all users";
-        log.info(msg);
         List<UserListItem> list = userService.getAll(id);
 
         return ResponseEntity.ok()

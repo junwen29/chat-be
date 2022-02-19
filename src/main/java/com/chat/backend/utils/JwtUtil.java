@@ -4,8 +4,10 @@ import com.chat.backend.entities.ChatAppUser;
 import io.jsonwebtoken.*;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 
 @Component
@@ -70,5 +72,16 @@ public class JwtUtil {
                 .setExpiration(new Date(System.currentTimeMillis() + 7 * 24 * 60 * 60 * 1000)) // 1 week
                 .signWith(SignatureAlgorithm.HS512, secret)
                 .compact();
+    }
+
+    /**
+     * @param request from controller methods
+     * @return id - Get authorization header and validate
+     */
+    public String getUserId(HttpServletRequest request){
+        // Get authorization header and validate
+        final String header = request.getHeader(HttpHeaders.AUTHORIZATION);
+        String token = header.split(" ")[1].trim();
+        return getUserId(token);
     }
 }
