@@ -18,7 +18,7 @@ public interface ChatMessageService {
      * 2) update associated chat room as the last message
      * 3) broadcast a notification to online users in the chat room
      */
-    ChatMessage save(SendMessageForm form, String senderUserId);
+    ChatMessage send(SendMessageForm form, String senderUserId);
 
     DecryptedChatMessage get(String id);
 

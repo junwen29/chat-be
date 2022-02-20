@@ -28,4 +28,16 @@ public class ChatMessage extends BaseDocument{
     public ChatMessage(SendMessageForm form) {
         this.chatRoomId = form.getChatRoomId();
     }
+
+    public String getInitials(){
+        String[] arr = this.getCreatedBy().split(" ");
+        if (arr.length > 2){
+            char first = arr[0].toUpperCase().charAt(0);
+            char last = arr[arr.length -1].toUpperCase().charAt(0);
+            return String.valueOf(first) + last;
+        }
+        else {
+            return String.valueOf(arr[0].toUpperCase().charAt(0));
+        }
+    }
 }

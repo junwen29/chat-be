@@ -14,6 +14,10 @@ public interface ChatAppUserService {
     LoginSuccessResponse login(LoginForm form);
     void logout();
 
+    /**
+     * @param userId is the requester userId
+     * @return a list of users without the requester user
+     */
     List<UserListItem> getAll(String userId);
 
     /**
@@ -30,4 +34,10 @@ public interface ChatAppUserService {
     String getLastSeen(ChatAppUser user);
 
     String getName(String userId);
+
+    /**
+     * @param userId of the requester
+     * @return the avatar image url or default to something if not exists
+     */
+    String getAvatar(String userId);
 }

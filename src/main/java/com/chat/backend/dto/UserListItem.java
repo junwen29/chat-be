@@ -13,7 +13,7 @@ public class UserListItem {
     private String title;
     private String lastSeen;
     private boolean isOnline;
-
+    private String initials;
 }
 
 

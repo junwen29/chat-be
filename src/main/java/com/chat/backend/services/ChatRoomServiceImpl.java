@@ -45,16 +45,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         );
         query.with(Sort.by(Sort.Direction.DESC, "updated_at"));
         List<ChatRoom> chatRooms = mongoTemplate.find(query, ChatRoom.class);
-        chatRooms.forEach(chatRoom -> {
-            List<ChatRoomMember> members = chatRoom.getMembers();
-            members.removeIf(member -> member.getId().equals(id));
-
-            // Single Chat ==> need to add in the title
-            if (members.size() == 1){
-                List<String> names = members.stream().map(ChatRoomMember::getName).collect(Collectors.toList());
-                chatRoom.setTitle(names.get(0));
-            }
-        });
+        chatRooms.forEach(chatRoom -> updateSingleMemberChatTitleAndAvatar(chatRoom, id));
 
         return chatRooms.stream().map(this::decryptChatRoom).collect(Collectors.toList());
     }
@@ -75,15 +66,25 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
         if (chatRoom == null){
             List<ChatRoomMember> members = new ArrayList<>();
-            ChatRoomMember owner = new ChatRoomMember(userId, userService.getName(userId));
-            ChatRoomMember member1 = new ChatRoomMember(selectedUserId, userService.getName(selectedUserId));
+
+            ChatRoomMember owner = new ChatRoomMember(
+                    userId,
+                    userService.getName(userId),
+                    userService.getAvatar(userId)
+            );
+
+            ChatRoomMember member1 = new ChatRoomMember(
+                    selectedUserId,
+                    userService.getName(selectedUserId),
+                    userService.getAvatar(selectedUserId)
+            );
             members.add(owner);
             members.add(member1);
 
-            String defaultAvatarUrl = "https://cdn.vuetifyjs.com/images/lists/5.jpg";
-
-            chatRoom = create(members, defaultAvatarUrl, owner);
+            chatRoom = create(members, owner.getAvatar(), owner);
         }
+
+        updateSingleMemberChatTitleAndAvatar(chatRoom, userId);
 
         return decryptChatRoom(chatRoom);
     }
@@ -149,5 +150,23 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         }
 
         return decryptedChatRoom;
+    }
+
+    private void updateSingleMemberChatTitleAndAvatar(ChatRoom encrypted, String requesterId){
+        List<ChatRoomMember> members = encrypted.getMembers();
+        members.removeIf(member -> member.getId().equals(requesterId));
+
+        // Single Chat ==> need to add in the title and avatar
+        if (members.size() == 1){
+
+            String title = encrypted.getTitle();
+            if (title == null || title.isEmpty()){
+                title = encrypted.resolveTitle(requesterId);
+                encrypted.setTitle(title);
+            }
+
+            List<String> avatars = members.stream().map(ChatRoomMember::getAvatar).collect(Collectors.toList());
+            encrypted.setAvatar(avatars.get(0));
+        }
     }
 }

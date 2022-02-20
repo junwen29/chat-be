@@ -9,6 +9,7 @@ import com.chat.backend.repositories.ChatMessageRepository;
 import com.chat.backend.utils.DateTimeUtil;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -18,7 +19,6 @@ import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -45,8 +45,11 @@ public class ChatMessageServiceImpl implements ChatMessageService{
     @Autowired
     private MongoTemplate mongoTemplate;
 
+    @Value("${app.defaultAvatar}")
+    private String defaultAvatar;
+
     @Override
-    public ChatMessage save(SendMessageForm form, String senderUserId) {
+    public ChatMessage send(SendMessageForm form, String senderUserId) {
         ChatMessage message = new ChatMessage(form);
         String senderName = userService.getName(senderUserId);
 
@@ -66,6 +69,7 @@ public class ChatMessageServiceImpl implements ChatMessageService{
         ChatRoom updated = chatRoomService.updateLastMessage(saved);
 
         // TODO broadcast message saved event
+
 
         return saved;
     }
@@ -118,8 +122,8 @@ public class ChatMessageServiceImpl implements ChatMessageService{
                                         encryptService.decrypt(m.getEncryptedText())
                                 )
                         );
-                        String defaultAvatarUrl = "https://cdn.vuetifyjs.com/images/lists/3.jpg";
-                        d.setAvatar(defaultAvatarUrl);
+
+                        d.setAvatar(defaultAvatar);
 
                         // use created_by to check if the message is from requester.
                         if (d.getCreatedBy().equals(userService.getName(requesterId))){

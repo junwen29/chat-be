@@ -28,7 +28,7 @@ public class ChatMessageController {
     public ResponseEntity<ChatMessage> sendMessage(@Valid @RequestBody SendMessageForm form, HttpServletRequest request){
         String id = jwtUtil.getUserId(request);
         log.info(String.format("POST request from user with id = %s to send message", id));
-        ChatMessage saved = chatMessageService.save(form, id);
+        ChatMessage saved = chatMessageService.send(form, id);
         return ResponseEntity.ok(saved);
     }
 

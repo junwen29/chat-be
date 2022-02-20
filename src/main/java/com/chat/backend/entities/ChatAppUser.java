@@ -41,6 +41,8 @@ public class ChatAppUser extends BaseDocument implements UserDetails, Serializab
     @Field("is_enabled")
     private boolean isEnabled;
 
+    private String avatar;
+
     public ChatAppUser(AccountRegistrationForm form) {
         this.name = form.getName();
         this.email = form.getEmail();

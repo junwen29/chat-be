@@ -1,6 +1,5 @@
 package com.chat.backend.controllers;
 
-import com.chat.backend.dto.DecryptedChatMessage;
 import com.chat.backend.dto.DecryptedChatRoom;
 import com.chat.backend.dto.MessageGroup;
 import com.chat.backend.services.ChatMessageService;

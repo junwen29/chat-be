@@ -23,6 +23,8 @@ public class DecryptedChatMessage extends BaseDocument {
     // indicate from ME or from others
     private String from;
 
+    private String initials;
+
     public DecryptedChatMessage(ChatMessage encrypted) {
         this.id =encrypted.getId();
         this.chatRoomId = encrypted.getChatRoomId();
@@ -32,5 +34,7 @@ public class DecryptedChatMessage extends BaseDocument {
 
         setUpdatedAt(encrypted.getUpdatedAt());
         setUpdatedBy(encrypted.getUpdatedBy());
+
+        this.initials = encrypted.getInitials();
     }
 }

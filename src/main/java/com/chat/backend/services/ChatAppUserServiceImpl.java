@@ -14,6 +14,7 @@ import com.chat.backend.utils.DateTimeUtil;
 import com.chat.backend.utils.JwtUtil;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -21,10 +22,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -49,6 +50,9 @@ public class ChatAppUserServiceImpl implements ChatAppUserService {
     @Autowired
     private WebSocketSessionService webSocketSessionService;
 
+    @Value("${app.defaultAvatar}")
+    private String defaultAvatar;
+
     @Override
     public void register(AccountRegistrationForm form) {
         ChatAppUser user = new ChatAppUser(form);
@@ -72,6 +76,9 @@ public class ChatAppUserServiceImpl implements ChatAppUserService {
 
         user.setPassword(passwordEncoder.encode(form.getPassword()));
         user.setCreatedAt(dateTimeUtil.now());
+
+        user.setAvatar(defaultAvatar);
+
         repository.save(user);
         log.info(String.format("New user registered: %s", user.getName()));
     }
@@ -94,33 +101,25 @@ public class ChatAppUserServiceImpl implements ChatAppUserService {
 
     @Override
     public void logout() {
-    // TODO close all chat web socket connections
+        // TODO close all chat web socket connections
     }
 
-    /**
-     * @param userId is the requester userId
-     * @return a list of users without the requester user
-     */
     @Override
     public List<UserListItem> getAll(String userId) {
-        List<UserListItem> list = new ArrayList<>();
+        List<UserListItem> list;
 
         List<ChatAppUser> chatAppUsers = repository.findAll();
         // remove requester user
         chatAppUsers.removeIf(chatAppUser -> chatAppUser.getId().equals(userId));
 
-        for (int i = 0; i < chatAppUsers.size(); i++) {
-            ChatAppUser u = chatAppUsers.get(i);
-            list.add(
-                    new UserListItem(
-                            u.getId(),
-                            String.format("https://cdn.vuetifyjs.com/images/lists/%d.jpg", i+1),
-                            u.getName(),
-                            getLastSeen(u),
-                            isUserOnline(u)
-                    )
-            );
-        }
+        list = chatAppUsers.stream().map(u -> new UserListItem(
+                u.getId(),
+                getAvatar(u.getId()),
+                u.getName(),
+                getLastSeen(u),
+                isUserOnline(u),
+                u.getInitials()
+        )).collect(Collectors.toList());
 
         return list;
     }
@@ -193,6 +192,22 @@ public class ChatAppUserServiceImpl implements ChatAppUserService {
         Optional<ChatAppUser> optional = repository.findById(userId);
         if (optional.isPresent()){
             return optional.get().getName();
+        }
+        else
+            throw new UserNotFoundException(String.format("Unable to find user with id = %s",userId));
+    }
+
+    @Override
+    public String getAvatar(String userId) {
+        Optional<ChatAppUser> optional = repository.findById(userId);
+        if (optional.isPresent()){
+
+            String avatar = optional.get().getAvatar();
+            if (avatar == null || avatar.isEmpty()){
+                avatar = defaultAvatar;
+                log.info(String.format("User id = %s does not have avatar",userId));
+            }
+            return avatar;
         }
         else
             throw new UserNotFoundException(String.format("Unable to find user with id = %s",userId));

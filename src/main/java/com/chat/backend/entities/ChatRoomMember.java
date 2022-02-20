@@ -12,4 +12,5 @@ public class ChatRoomMember {
 
     private String name;
 
+    private String avatar;
 }
