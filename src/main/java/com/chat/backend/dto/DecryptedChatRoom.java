@@ -29,4 +29,11 @@ public class DecryptedChatRoom extends BaseDocument {
         this.lastMessage = lastMessage;
         this.lastMessageAt = chatRoom.getLastMessageAt();
     }
+
+    public DecryptedChatRoom(ChatRoom encrypted) {
+        this.id = encrypted.getId();
+        this.avatar = encrypted.getAvatar();
+        this.title = encrypted.getTitle();
+        this.lastMessageAt = encrypted.getLastMessageAt();
+    }
 }

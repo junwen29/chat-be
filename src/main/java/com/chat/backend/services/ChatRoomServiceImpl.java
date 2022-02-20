@@ -125,16 +125,29 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
     private DecryptedChatRoom decryptChatRoom(ChatRoom encrypted){
         byte[] encryptedLastMessage = encrypted.getLastMessage();
-        byte[] decrypted = encryptService.decrypt(encryptedLastMessage);
 
-        DecryptedChatRoom decryptedChatRoom = new DecryptedChatRoom(encrypted, new String(decrypted));
+        DecryptedChatRoom decryptedChatRoom;
+
+        if (encryptedLastMessage != null){
+            byte[] decrypted = encryptService.decrypt(encryptedLastMessage);
+            decryptedChatRoom  = new DecryptedChatRoom(encrypted, new String(decrypted));
+        }
+        else
+            decryptedChatRoom  = new DecryptedChatRoom(encrypted);
+
+        String lastMessageAt = decryptedChatRoom.getLastMessageAt();
+
+        if (lastMessageAt == null)
+            return decryptedChatRoom;
+
         try {
-            String timeOnly = dateTimeUtil.getTimeOnly(decryptedChatRoom.getLastMessageAt());
+            String timeOnly = dateTimeUtil.getTimeOnly(lastMessageAt);
             decryptedChatRoom.setLastMessageAt(timeOnly);
         } catch (ParseException e) {
             e.printStackTrace();
             log.info(String.format("Unable to parse chat room last message at field: %s", decryptedChatRoom.getLastMessageAt()));
         }
+
         return decryptedChatRoom;
     }
 }
