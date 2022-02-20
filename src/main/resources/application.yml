@@ -1,7 +1,11 @@
+
+
 server:
   port: 8000
 
 spring:
+  application:
+    name: chat-service
   data:
     mongodb:
       uri: mongodb://junwen:secret@localhost:27017/${spring.data.mongodb.database}
