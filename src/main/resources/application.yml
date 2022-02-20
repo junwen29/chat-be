@@ -16,6 +16,7 @@ app:
   encrypt:
     password: password123
     salt: 2e93988d-bc7b-47cc-8e90-30795c642e37
+  defaultAvatar: "https://cdn.vuetifyjs.com/images/parallax/material.jpg"
 
 rabbitmq:
   queues:
